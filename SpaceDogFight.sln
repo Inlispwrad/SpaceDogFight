@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceDogFight.Server", "server\SpaceDogFight.Server.csproj", "{465EC448-3270-4CA5-B26F-554E071850F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared.Core", "shared\Shared.Core.csproj", "{598BFEFB-6F1B-41E3-B3DF-B4CF07DC2FEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{465EC448-3270-4CA5-B26F-554E071850F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{465EC448-3270-4CA5-B26F-554E071850F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{465EC448-3270-4CA5-B26F-554E071850F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{598BFEFB-6F1B-41E3-B3DF-B4CF07DC2FEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{598BFEFB-6F1B-41E3-B3DF-B4CF07DC2FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{598BFEFB-6F1B-41E3-B3DF-B4CF07DC2FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{598BFEFB-6F1B-41E3-B3DF-B4CF07DC2FEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

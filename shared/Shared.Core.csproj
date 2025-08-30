@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <!-- 统一用 .NET Standard 做共享层，既能被 .NET 8 引用，也能给 Unity 当 DLL -->
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+
+        <!-- 可选项：便于在 Unity/服务器侧看到注释 -->
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+        <!-- 与你之前的 Directory.Build.props 能很好协作；这里不覆盖 OutputPath -->
+        <RootNamespace>Shared.Core</RootNamespace>
+        <AssemblyName>Shared.Core</AssemblyName>
+
+        <!-- 让构建更可复现 -->
+        <Deterministic>true</Deterministic>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+    <!-- 如果以后需要第三方库（例如 Newtonsoft.Json），在这里加 PackageReference-->
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+</Project>
