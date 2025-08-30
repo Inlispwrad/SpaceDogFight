@@ -1,0 +1,74 @@
+# 🔹 顶层结构
+
+```
+SpaceDogFight/
+│── client/              # 客户端工程（Unity / Godot / Cocos ...）
+│── server/              # 服务端工程（.NET / Node / Go ...）
+│── shared/              # 双端共用的定义（协议、数据结构、常量）
+│── docs/                # 设计文档、API说明、需求文档
+│── tools/               # 小工具（协议生成、数据表处理）
+│── tests/               # 自动化测试
+│── build/               # 构建/打包产物（通常git忽略）
+└── README.md
+```
+
+---
+
+# 🔹 客户端结构（例：Unity）
+
+```
+client/
+│── Assets/
+│    ├── Scripts/
+│    │    ├── Core/            # 基础框架：单例、事件系统、工具类
+│    │    ├── Net/             # 网络层：WebSocket客户端、消息分发
+│    │    ├── Game/            # 游戏逻辑：战机控制、子弹、碰撞
+│    │    ├── UI/              # UI逻辑
+│    │    └── Config/          # 配置加载、常量定义
+│    ├── Prefabs/              # 预制体（战机、子弹、UI）
+│    ├── Scenes/               # 场景（Login、Lobby、Battle）
+│    ├── Art/                  # 美术资源（Sprites、Textures）
+│    ├── Audio/                # 音效、音乐
+│    └── Shaders/
+│
+└── ProjectSettings/           # Unity工程配置
+```
+
+---
+
+# 🔹 服务端结构（例：.NET WebSocket 服务器）
+
+```
+server/
+│── Program.cs
+│── Game/
+│    ├── Core/                 # 主循环、房间管理、调度
+│    ├── Net/                  # WebSocket通信、协议解析
+│    ├── Room/                 # 房间逻辑（Lobby/Playing/GameOver）
+│    ├── Entity/               # 玩家、战机、子弹等状态
+│    └── Systems/              # 物理、战斗、结算系统
+│
+│── Config/                    # 配置文件（JSON/表格）
+│── Logs/                      # 服务器日志（运行时生成）
+└── Tests/                     # 单元/压力测试
+```
+
+---
+
+# 🔹 shared（共享模块）
+
+```
+shared/
+│── Protocols/                 # 协议定义（JSON schema / Protobuf）
+│── Constants/                 # 常量（tick速率、能量消耗）
+│── DataTypes/                 # 公共数据结构（PlayerState、BulletState）
+```
+
+---
+
+# 🔹 为什么要这样分？
+
+1. **client/server/shared 分离**：保证客户端只管表现，服务端负责权威逻辑，公共部分放 shared。
+2. **Game/Net/Entity/Systems 分层**：方便扩展，未来加 AI、重播、统计都能插。
+3. **Assets 分类清晰**：美术/UI/脚本分开，美术和程序互不干扰。
+4. **Config 驱动**：把数值/消耗写到表或 JSON，避免硬编码。
