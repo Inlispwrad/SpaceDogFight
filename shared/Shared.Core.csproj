@@ -21,5 +21,6 @@
     <!-- 如果以后需要第三方库（例如 Newtonsoft.Json），在这里加 PackageReference-->
     <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="System.Text.Json" Version="8.0.4" />
     </ItemGroup>
 </Project>

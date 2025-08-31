@@ -14,7 +14,9 @@ builder.Services.AddWebSockets(opts => opts.KeepAliveInterval = TimeSpan.FromSec
 // Dependencies Injection
 builder.Services.AddSingleton<RoomManager>();
 builder.Services.AddSingleton<ConnectionManager>();
-// builder.Services.AddHostedService<GameLoopService>();
+builder.Services.AddSingleton<RoomManagerHandler>();
+builder.Services.AddSingleton<RoomHandler>();
+builder.Services.AddSingleton<MsgDispatcher>();
 
 var app = builder.Build();
 app.UseWebSockets();
@@ -39,6 +41,3 @@ app.Map("/ws", async _context =>
 
 // Launch App (Default Listen http://0.0.0.0:5000)
 app.Run();
-
-
-

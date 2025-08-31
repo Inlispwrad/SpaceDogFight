@@ -1,19 +1,18 @@
+using System;
 using System.Collections.Concurrent;
+using SpaceDogFight.Server.Game.Net;
 
 namespace SpaceDogFight.Server.Game.Room;
 
-public class RoomManager
+public class RoomManager(ConnectionManager _connectionManager)
 {
     private readonly ConcurrentDictionary<string, Room> rooms = new();
-
-    
-    
-    
+ 
+    #region API
     public bool RoomExists(string _roomName) => rooms.ContainsKey(_roomName);
-
     public bool TryCreateRoom(string _roomName, string _password, int _capacity = 2)
     {
-        return rooms.TryAdd(_roomName, new Room(_roomName, _password, Math.Clamp(_capacity, 2, 4)));   
+        return rooms.TryAdd(_roomName, new Room(_roomName, _password, Math.Clamp(_capacity, 2, 4), _connectionManager.BroadcastAsync, _connectionManager.SendAsync));   
     }
 
     public Room? GetRoom(string _roomName)
@@ -21,38 +20,42 @@ public class RoomManager
         rooms.TryGetValue(_roomName, out var room);
         return room;
     }
-
-    public bool TryJoinRoom(string _roomName, string _playerName, string _password, out string error)
+    public bool TryJoinRoom(string _roomName, string _playerName, Player _player, string _password, out string error)
     {
         error = "";
+
+        if (string.IsNullOrWhiteSpace(_playerName))
+        {
+            error = "Player name is required.";
+            return false;
+        }
+        
         if (!rooms.TryGetValue(_roomName, out var room))
         {
-            error = $"Room_{_roomName} not found)";
+            error = $"Room({_roomName}) not found.";
             return false;
         }
 
         if (!room.IsPasswordValid(_password))
         {
-            error = "Password is invalid";
-            return false;
-        }
-
-        if (room.PlayerCount >= room.PlayerCapacity)
-        {
-            error = "Room is full.";
+            error = "Password is invalid.";
             return false;
         }
         
-        if (!room.TryAddPlayer(_playerName))
+        if (!room.TryAddPlayer(_playerName, _player))
         {
-            error = $"PlayerName({_playerName}) is already existed).";
+            if (room.HasPlayer(_playerName))
+                error = $"Player name [{_playerName}] already exists.";
+            else if (room.PlayerCount >= room.PlayerCapacity)
+                error = "Room is full.";
+            else
+                error = "Failed to join room.";
             return false;
         }
 
         return true;
     }
-
-    public void LeaveRoom(string _roomName, string _playerName)
+    public bool LeaveRoom(string _roomName, string _playerName)
     {
         if (rooms.TryGetValue(_roomName, out var room))
         {
@@ -63,6 +66,12 @@ public class RoomManager
             {
                 rooms.TryRemove(_roomName, out _);
             }
+
+            return true;
         }
+
+        return false;
     }
+    public List<string> GetAllRoomNames() => rooms.Keys.ToList();
+    #endregion API
 }
