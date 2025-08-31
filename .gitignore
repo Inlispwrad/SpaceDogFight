@@ -53,6 +53,10 @@ ExportedObj/
 sysinfo.txt
 mono_crash.*
 
+# Godot 4+ specific ignores
+.godot/
+/android/
+
 # 构建产物
 *.apk
 *.aab

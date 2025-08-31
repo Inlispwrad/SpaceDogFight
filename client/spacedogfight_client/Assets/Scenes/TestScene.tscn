@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://cf8jbvxcioegs"]
+
+[node name="BattleScene" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="GameManager" type="Node" parent="."]
+
+[node name="PlayerController" type="Node" parent="."]
+
+[node name="Network" type="Node" parent="."]
+
+[node name="FighterManager" type="Node" parent="."]
