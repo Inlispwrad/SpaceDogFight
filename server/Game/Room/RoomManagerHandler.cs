@@ -17,6 +17,9 @@ public class RoomManagerHandler(RoomManager _roomManager, ConnectionManager _con
             case ClientMsgTypes.JoinRoom:
                 await JoinRoom(_ctx);
                 break;
+            case ClientMsgTypes.RequestRoomList:
+                await RequestRoomList(_ctx);
+                break;
             default: break;
         }
     }
@@ -66,4 +69,14 @@ public class RoomManagerHandler(RoomManager _roomManager, ConnectionManager _con
         }
     }
 
+    private async Task RequestRoomList(MsgContext _ctx)
+    {
+        if (_ctx.Envelope.op == ClientMsgTypes.RequestRoomList)
+        {
+            await _connectionManager.SendAsync(_ctx.PlayerId, ServerMsgTypes.RoomList, new RoomListArgs()
+            {
+                roomNames = _roomManager.GetAllRoomNames()
+            });
+        }
+    }
 }

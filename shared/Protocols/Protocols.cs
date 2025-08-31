@@ -8,7 +8,6 @@ public class ChatMessageArgs
     public string message;
 }
 
-
 // Client 
 [Serializable]
 public class JoinRoomArgs
@@ -25,9 +24,22 @@ public class CreateRoomArgs
     public int capacity;
 }
 
-
 // Server
+[Serializable]
 public class RoomListArgs
 {
     public List<string> roomNames;
+}
+
+[Serializable]
+public class PlayerRoomArgs
+{
+    public string playerName;
+    public bool isReead;
+}
+
+[Serializable]
+public class RoomState
+{
+    public List<PlayerRoomArgs> players;
 }

@@ -11,6 +11,7 @@ public class MsgDispatcher(RoomManagerHandler _roomManagerHandler, RoomHandler _
         {
             case ClientMsgTypes.CreateRoom: 
             case ClientMsgTypes.JoinRoom:
+            case ClientMsgTypes.RequestRoomList:
                 await _roomManagerHandler.HandleAsync(_ctx);
                 break;
             case ClientMsgTypes.LeaveRoom:

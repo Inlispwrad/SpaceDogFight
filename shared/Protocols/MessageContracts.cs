@@ -13,6 +13,7 @@ public static class ClientMsgTypes
     public const string JoinRoom = "client::join_room";
     public const string LeaveRoom = "client::leave_room";
     
+    public const string RequestRoomList = "client::request_room_list";
     public const string Chat = "client::chat";
 }
 

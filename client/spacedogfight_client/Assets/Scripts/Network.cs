@@ -1,9 +1,12 @@
+using System;
 using Godot;
 using System.Text;
+using Shared.Core.DataTypes;
 using SpaceDogFight.Shared.Protocols;
 
 public partial class Network : Node
 {
+    #region WebSocket
     private WebSocketPeer _ws;
     // 按你实际端口改：如果是日志里 63623 就改成 63623；默认 Kestrel 本地是 5000
     private const string Url = "ws://localhost:63623/ws"; // or 63623
@@ -12,11 +15,9 @@ public partial class Network : Node
     private double _heartbeat = 0;
     private double _reconnectCd = 0;
     private int _retry = 0;
-
+    
     public override void _Ready()
     {
-        
-        
         _ws = new WebSocketPeer();
         var err = _ws.ConnectToUrl(Url);                  // 这里只是“开始连接”，不是已连上
         GD.Print($"[WS] start connect, ret={err}");
@@ -41,6 +42,7 @@ public partial class Network : Node
                     GD.Print("[Network] CONNECTED");
                     // 初次打个招呼（按你服务器的协议替换）
                     _ws.SendText("{\"type\":\"hello\",\"from\":\"godot\"}");
+                    RequestRoomList();
                 }
 
                 // 收包
@@ -48,6 +50,7 @@ public partial class Network : Node
                 {
                     var pkt = _ws.GetPacket();
                     GD.Print("[Network] RECV: " + Encoding.UTF8.GetString(pkt));
+                    //TODO:: Call MsgDispatcher
                 }
 
                 // 心跳（每 15s）
@@ -55,7 +58,8 @@ public partial class Network : Node
                 if (_heartbeat >= 15.0)
                 {
                     _heartbeat = 0;
-                    _ws.SendText("{\"type\":\"ping\"}");
+                    //_ws.SendText("{\"type\":\"ping\"}");
+                    Chat("Jin", "Hello! This is beats.");
                 }
                 break;
 
@@ -67,7 +71,6 @@ public partial class Network : Node
                 GD.PrintErr($"[Network] CONNECTION CLOSED code={_ws.GetCloseCode()} reason={_ws.GetCloseReason()}");
                 TryReconnect(delta);
                 break;
-            
         }
     }
 
@@ -91,9 +94,39 @@ public partial class Network : Node
     }
 
     // 业务侧主动发消息
-    public void SendJson(string json)
+    public void SendJson(string _json)
     {
         if (_ws != null && _ws.GetReadyState() == WebSocketPeer.State.Open)
-            _ws.SendText(json);
+            _ws.SendText(_json);
     }
+    #endregion
+    
+    
+    #region Message EventHandler
+    // Room
+    public static event Action<RoomListArgs> EventHandler_ReceivedRoomList;
+    public static event Action<RoomState> EventHandler_ReceivedRoomState;
+    // Chat
+    public static event Action<ChatMessageArgs> EventHandler_ReceivedChatMessage;
+    // In Game
+    
+    #endregion
+    public void Chat(string _playerName, string _message)
+    {
+        var chatMsg = new ChatMessageArgs()
+        {
+            playerName = _playerName,
+            message = _message
+        };
+        _ws.SendText(Msg.Wrap(ClientMsgTypes.Chat, chatMsg).ToJsonString());
+    }
+
+    public void RequestRoomList()
+    {
+        _ws.SendText(Msg.Wrap(ClientMsgTypes.RequestRoomList, new(){
+        }).ToJsonString());
+    }
+
+
+
 }
