@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://cgvjnt7t32ql7"]
+
+[ext_resource type="Script" uid="uid://b54j3n8tpmorr" path="res://Assets/Scripts/ApplicationManager.cs" id="1_kwblh"]
+[ext_resource type="Script" uid="uid://blsuxwssnlnw3" path="res://Assets/Scripts/Network.cs" id="2_wkehv"]
+
+[node name="Main" type="Node" node_paths=PackedStringArray("network")]
+script = ExtResource("1_kwblh")
+network = NodePath("Network")
+
+[node name="Network" type="Node" parent="."]
+script = ExtResource("2_wkehv")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

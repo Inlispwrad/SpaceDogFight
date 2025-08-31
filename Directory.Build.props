@@ -1,0 +1,13 @@
+<Project>
+    <!-- 可选的统一编译选项 -->
+    <PropertyGroup>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <!-- 关键：把要复用的项目加进来（相对路径写成从 props 到 csproj 的路径） -->
+    <ItemGroup Condition="'$(MSBuildProjectName)' == 'SpaceDogFight_client'">
+        <ProjectReference Include="$(MSBuildThisFileDirectory)\shared\Shared.Core.csproj"
+                          Condition="Exists('$(MSBuildThisFileDirectory)\shared\Shared.Core.csproj')" />
+    </ItemGroup>
+</Project>

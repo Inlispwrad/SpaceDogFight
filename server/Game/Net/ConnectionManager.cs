@@ -5,11 +5,12 @@ using SpaceDogFight.Shared.Protocols;
 
 namespace SpaceDogFight.Server.Game.Net;
 
-public class ConnectionManager(MsgDispatcher _dispatcher)
+public class ConnectionManager()
 {
     // Thread Safety Dictionary
     private readonly ConcurrentDictionary<string, WebSocket> sockets = new();
     public readonly PlayerManager playerManager = new();
+    private MsgDispatcher dispatcher;
     
     // Entry: Handle Player's entire life circle of the connection.
     public async Task HandleAsync(string _playerId, WebSocket _socket)
@@ -42,7 +43,7 @@ public class ConnectionManager(MsgDispatcher _dispatcher)
                 Console.WriteLine($"[Message::receive] player({_playerId}): {msg}");
                 var env = Msg.Parse(msg);
 
-                if (env != null && _dispatcher != null)
+                if (env != null && dispatcher != null)
                 {
                     var ctx = new MsgContext()
                     {
@@ -50,7 +51,7 @@ public class ConnectionManager(MsgDispatcher _dispatcher)
                         Envelope = env
                     };
 
-                    await _dispatcher.DispatchAsync(ctx);
+                    await dispatcher.DispatchAsync(ctx);
                 }
             }
         }
@@ -77,7 +78,12 @@ public class ConnectionManager(MsgDispatcher _dispatcher)
             Console.WriteLine($"[Connection::close] player({_playerId}) disconnected.");
         }
     }
-    
+
+    public void SetDispatcher(MsgDispatcher _dispatcher)
+    {
+        dispatcher = _dispatcher;
+    }
+
     public delegate Task BroadcastDelegate(List<string> _playerIds, string _op, object _data);
     public delegate Task SendDelegate(string _playerId, string _op, object _data);
     

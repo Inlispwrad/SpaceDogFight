@@ -18,9 +18,14 @@ builder.Services.AddSingleton<RoomManagerHandler>();
 builder.Services.AddSingleton<RoomHandler>();
 builder.Services.AddSingleton<MsgDispatcher>();
 
+
+
 var app = builder.Build();
 app.UseWebSockets();
 
+var dispatcher = app.Services.GetRequiredService<MsgDispatcher>();
+var connectionManager = app.Services.GetRequiredService<ConnectionManager>();
+connectionManager.SetDispatcher(dispatcher);
 
 app.Map("/ws", async _context =>
 {
