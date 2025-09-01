@@ -22,6 +22,9 @@ public class RoomHandler(RoomManager _roomManager, ConnectionManager _connection
             case ClientMsgTypes.CancelReady: 
                 await CancelReady(_ctx);
                 break;
+            default:
+                await GameMsg(_ctx);
+                break;
         }
     }
 
@@ -82,6 +85,7 @@ public class RoomHandler(RoomManager _roomManager, ConnectionManager _connection
         {
             player.IsReady = true;
             await room.BroadcastRoomState();
+            room.TryStartCountdown();
         }
     }
 
@@ -91,6 +95,14 @@ public class RoomHandler(RoomManager _roomManager, ConnectionManager _connection
         {
             player.IsReady = false;
             await room.BroadcastRoomState();
+        }
+    }
+
+    private async Task GameMsg(MsgContext _ctx)
+    {
+        if (GetRoomAndPlayer(_ctx, out Player player, out Room room))
+        {
+            await room.GameMessageHandler(_ctx);
         }
     }
 }

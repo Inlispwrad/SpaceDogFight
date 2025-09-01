@@ -42,7 +42,6 @@ public partial class Network : Node
             SendJson(Msg.Wrap(ClientMsgTypes.FighterStats, _fighterStats).ToJsonString());
         };
         
-        
         ShowBlackScreen("Initializing Network...");
         _ws = new WebSocketPeer();
         var err = _ws.ConnectToUrl(Url);                  // 这里只是“开始连接”，不是已连上
@@ -152,6 +151,8 @@ public partial class Network : Node
     public static event Action<RequestResponse> EventHandler_CreateRoomResponse;
     // Chat
     public static event Action<ChatMessageArgs> EventHandler_ReceivedChatMessage;
+
+    public static event Action<ServerMessage> EventHandler_ReceivedServerMessage;
     // In Game
     public static event Action<FighterState> EventHandler_ReceivedFighterState;
     // Dispatcher
@@ -162,6 +163,9 @@ public partial class Network : Node
             // Chat
             case ServerMsgTypes.Chat: 
                 EventHandler_ReceivedChatMessage?.Invoke(Msg.DataAs<ChatMessageArgs>(_envelope)); 
+                break;
+            case ServerMsgTypes.Message:
+                EventHandler_ReceivedServerMessage?.Invoke(Msg.DataAs<ServerMessage>(_envelope));
                 break;
             // Lobby
             case ServerMsgTypes.RoomList:
