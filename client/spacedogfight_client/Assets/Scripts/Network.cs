@@ -2,6 +2,7 @@ using System;
 using Godot;
 using System.Text;
 using Shared.Core.DataTypes;
+using Shared.Core.Protocols;
 using SpaceDogFight.Shared.Protocols;
 
 public partial class Network : Node
@@ -32,8 +33,17 @@ public partial class Network : Node
     
     public override void _Ready()
     {
-        ShowBlackScreen("Initializing Network...");
+        SendFighterMovement = (MovementState _fighterMovement) =>
+        {
+            SendJson(Msg.Wrap(ClientMsgTypes.FighterMovement, _fighterMovement).ToJsonString());
+        };
+        SendFighterStats = (StatsState _fighterStats) =>
+        {
+            SendJson(Msg.Wrap(ClientMsgTypes.FighterStats, _fighterStats).ToJsonString());
+        };
         
+        
+        ShowBlackScreen("Initializing Network...");
         _ws = new WebSocketPeer();
         var err = _ws.ConnectToUrl(Url);                  // 这里只是“开始连接”，不是已连上
         GD.Print($"[WS] start connect, ret={err}");
@@ -62,7 +72,6 @@ public partial class Network : Node
                     
                     // Init Request Hook
                     SendChatMessage = Chat;
-                    
                     
                     
                     RequestRoomList();
@@ -128,11 +137,11 @@ public partial class Network : Node
     }
     #endregion
     
-    
     #region Message Requester
 
     public static Action<string, string> SendChatMessage { get; private set; }
-
+    public static Action<MovementState> SendFighterMovement { get; private set; }
+    public static Action<StatsState> SendFighterStats { get; private set; }
     #endregion
     
     #region Message EventHandler
@@ -144,9 +153,7 @@ public partial class Network : Node
     // Chat
     public static event Action<ChatMessageArgs> EventHandler_ReceivedChatMessage;
     // In Game
-    
-    
-    
+    public static event Action<FighterState> EventHandler_ReceivedFighterState;
     // Dispatcher
     private void MsgDispatcher(MsgEnvelope _envelope)
     {
@@ -169,7 +176,9 @@ public partial class Network : Node
                 EventHandler_ReceivedRoomState?.Invoke(Msg.DataAs<RoomState>(_envelope));
                 break;
             // In Game
-            
+            case ServerMsgTypes.FighterState:
+                EventHandler_ReceivedFighterState?.Invoke(Msg.DataAs<FighterState>(_envelope));
+                break;
             default: ; break;
         }
     }
@@ -190,7 +199,4 @@ public partial class Network : Node
         _ws.SendText(Msg.Wrap(ClientMsgTypes.RequestRoomList, new(){
         }).ToJsonString());
     }
-
-
-
 }
