@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
+using Shared.Core.DataTypes;
 using SpaceDogFight.Shared.Protocols;
 
 namespace SpaceDogFight.Server.Game.Net;
@@ -15,6 +16,13 @@ public class ConnectionManager()
     // Entry: Handle Player's entire life circle of the connection.
     public async Task HandleAsync(string _playerId, WebSocket _socket)
     {
+        if (dispatcher == null)
+        {
+            Console.WriteLine($"[Fatal] Dispatcher not set for player({_playerId})");
+            return;
+        }
+        
+        
         sockets.AddOrUpdate(_playerId, _socket, (_, _old) => _socket);
         playerManager.RegisterPlayer(_playerId);
         Console.WriteLine($"[Connection::create] player({_playerId}) connected.");
@@ -22,6 +30,8 @@ public class ConnectionManager()
         var buffer = new byte[8 * 1024];
         var seg = new ArraySegment<byte>(buffer);
 
+        bool shouldDisconnect = false;
+        
         try
         {
             while (_socket.State == WebSocketState.Open)
@@ -43,39 +53,57 @@ public class ConnectionManager()
                 Console.WriteLine($"[Message::receive] player({_playerId}): {msg}");
                 var env = Msg.Parse(msg);
 
-                if (env != null && dispatcher != null)
+                try
                 {
-                    var ctx = new MsgContext()
+                    if (env != null && dispatcher != null)
                     {
-                        PlayerId = _playerId,
-                        Envelope = env
-                    };
+                        var ctx = new MsgContext()
+                        {
+                            PlayerId = _playerId,
+                            Envelope = env
+                        };
 
-                    await dispatcher.DispatchAsync(ctx);
+                        await dispatcher.DispatchAsync(ctx);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Failed to Parse Message...");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[Message::error] player({_playerId}) dispatch failed: {ex.Message}");
+                    await SendAsync(_playerId, ServerMsgTypes.Error,  new ServerMessage(){ message = ex.Message });
                 }
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"[Error] player({_playerId}) got exception: {ex.Message}");
+            shouldDisconnect = true;
         }
         finally
         {
-            try
+            if (shouldDisconnect)
             {
-                // 只有在我们这边仍是 Open/CloseReceived 时，才礼貌性发 Close
-                if (_socket.State == WebSocketState.Open || _socket.State == WebSocketState.CloseReceived)
-                    await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "bye", CancellationToken.None);
+                try
+                {
+                    // 只有在我们这边仍是 Open/CloseReceived 时，才礼貌性发 Close
+                    if (_socket.State == WebSocketState.Open || _socket.State == WebSocketState.CloseReceived)
+                        await _socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "bye", CancellationToken.None);
+                }
+                catch
+                {
+                    /* 忽略关闭中的异常，保持简单 */
+                }
+                // 关键点：只在字典里仍然指向“当前这个 socket 实例”时，才移除。
+                // 避免“同 pid 顶号”时，老连接把新连接的映射误删。
+                if (sockets.TryGetValue(_playerId, out var current) && ReferenceEquals(current, _socket))
+                    sockets.TryRemove(_playerId, out _);
+
+                _socket.Dispose();
+                Console.WriteLine($"[Connection::close] player({_playerId}) disconnected.");
             }
-            catch { /* 忽略关闭中的异常，保持简单 */ }
-
-            // 关键点：只在字典里仍然指向“当前这个 socket 实例”时，才移除。
-            // 避免“同 pid 顶号”时，老连接把新连接的映射误删。
-            if (sockets.TryGetValue(_playerId, out var current) && ReferenceEquals(current, _socket))
-                sockets.TryRemove(_playerId, out _);
-
-            _socket.Dispose();
-            Console.WriteLine($"[Connection::close] player({_playerId}) disconnected.");
         }
     }
 

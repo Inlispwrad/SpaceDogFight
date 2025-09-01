@@ -20,11 +20,11 @@ public class RoomManager(ConnectionManager _connectionManager)
         rooms.TryGetValue(_roomName, out var room);
         return room;
     }
-    public bool TryJoinRoom(string _roomName, string _playerName, Player _player, string _password, out string error)
+    public bool TryJoinRoom(string _roomName, string _playerId, Player _player, string _password, out string error)
     {
         error = "";
 
-        if (string.IsNullOrWhiteSpace(_playerName))
+        if (string.IsNullOrWhiteSpace(_player.playerName))
         {
             error = "Player name is required.";
             return false;
@@ -42,10 +42,10 @@ public class RoomManager(ConnectionManager _connectionManager)
             return false;
         }
         
-        if (!room.TryAddPlayer(_playerName, _player))
+        if (!room.TryAddPlayer(_player.playerName, _player))
         {
-            if (room.HasPlayer(_playerName))
-                error = $"Player name [{_playerName}] already exists.";
+            if (room.HasPlayer(_player.playerName))
+                error = $"Player name [{_player.playerName}] already exists.";
             else if (room.PlayerCount >= room.PlayerCapacity)
                 error = "Room is full.";
             else
@@ -60,10 +60,11 @@ public class RoomManager(ConnectionManager _connectionManager)
         if (rooms.TryGetValue(_roomName, out var room))
         {
             room.RemovePlayer(_playerName);
-
+            Console.WriteLine($"{_playerName} leave the room. Left {room.PlayerCount} players.");
             // 如果房间没人了，就删除
             if (!room.HasAnyPlayer())
             {
+                Console.WriteLine($"Since no player left remove room {_roomName}.");
                 rooms.TryRemove(_roomName, out _);
             }
 

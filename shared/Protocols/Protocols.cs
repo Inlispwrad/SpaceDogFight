@@ -19,6 +19,7 @@ public class JoinRoomArgs
 [Serializable]
 public class CreateRoomArgs
 {
+    public string playerName;
     public string roomName;
     public string password;
     public int capacity;
@@ -35,11 +36,24 @@ public class RoomListArgs
 public class PlayerRoomArgs
 {
     public string playerName;
-    public bool isReead;
+    public bool isReady;
 }
 
 [Serializable]
 public class RoomState
 {
-    public List<PlayerRoomArgs> players;
+    public List<PlayerRoomArgs> players = new();
+}
+
+[Serializable]
+public class RequestResponse
+{
+    public bool success;
+    public string error;
+}
+
+[Serializable]
+public class ServerMessage
+{
+    public string message;
 }

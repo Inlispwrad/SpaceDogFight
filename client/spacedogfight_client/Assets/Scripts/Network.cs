@@ -6,10 +6,24 @@ using SpaceDogFight.Shared.Protocols;
 
 public partial class Network : Node
 {
+    #region BlackScreen
+    [Export] private BlackVeil blackScreen;
+
+    private void ShowBlackScreen(string _noticeText)
+    {
+        if (blackScreen != null)
+        {
+            blackScreen.Show();
+            blackScreen.SetNotice(_noticeText);
+        }
+    }
+    #endregion
+    
+    
     #region WebSocket
     private WebSocketPeer _ws;
     // 按你实际端口改：如果是日志里 63623 就改成 63623；默认 Kestrel 本地是 5000
-    private const string Url = "ws://localhost:63623/ws"; // or 63623
+    private const string Url = "wss://57d09112cae6.ngrok-free.app/ws"; // or 63623
 
     private bool _connectedAnnounced = false;
     private double _heartbeat = 0;
@@ -18,6 +32,8 @@ public partial class Network : Node
     
     public override void _Ready()
     {
+        ShowBlackScreen("Initializing Network...");
+        
         _ws = new WebSocketPeer();
         var err = _ws.ConnectToUrl(Url);                  // 这里只是“开始连接”，不是已连上
         GD.Print($"[WS] start connect, ret={err}");
@@ -31,6 +47,7 @@ public partial class Network : Node
         switch (_ws.GetReadyState())
         {
             case WebSocketPeer.State.Connecting:
+                ShowBlackScreen("Connecting to server...");
                 // 等待握手完成
                 break;
 
@@ -42,15 +59,25 @@ public partial class Network : Node
                     GD.Print("[Network] CONNECTED");
                     // 初次打个招呼（按你服务器的协议替换）
                     _ws.SendText("{\"type\":\"hello\",\"from\":\"godot\"}");
+                    
+                    // Init Request Hook
+                    SendChatMessage = Chat;
+                    
+                    
+                    
                     RequestRoomList();
+                    
+                    ShowBlackScreen("Connected!!!");
+                    blackScreen?.Close(2f);
                 }
 
                 // 收包
                 while (_ws.GetAvailablePacketCount() > 0)
                 {
                     var pkt = _ws.GetPacket();
-                    GD.Print("[Network] RECV: " + Encoding.UTF8.GetString(pkt));
-                    //TODO:: Call MsgDispatcher
+                    var jsonString = Encoding.UTF8.GetString(pkt);
+                    GD.Print("[Network] RECV: " + jsonString);
+                    MsgDispatcher(Msg.Parse(jsonString));
                 }
 
                 // 心跳（每 15s）
@@ -59,7 +86,7 @@ public partial class Network : Node
                 {
                     _heartbeat = 0;
                     //_ws.SendText("{\"type\":\"ping\"}");
-                    Chat("Jin", "Hello! This is beats.");
+                    //Chat("Jin", "Hello! This is beats.");
                 }
                 break;
 
@@ -102,14 +129,51 @@ public partial class Network : Node
     #endregion
     
     
+    #region Message Requester
+
+    public static Action<string, string> SendChatMessage { get; private set; }
+
+    #endregion
+    
     #region Message EventHandler
     // Room
     public static event Action<RoomListArgs> EventHandler_ReceivedRoomList;
     public static event Action<RoomState> EventHandler_ReceivedRoomState;
+    public static event Action<RequestResponse> EventHandler_JoinRoomResponse;
+    public static event Action<RequestResponse> EventHandler_CreateRoomResponse;
     // Chat
     public static event Action<ChatMessageArgs> EventHandler_ReceivedChatMessage;
     // In Game
     
+    
+    
+    // Dispatcher
+    private void MsgDispatcher(MsgEnvelope _envelope)
+    {
+        switch (_envelope.op)
+        {
+            // Chat
+            case ServerMsgTypes.Chat: 
+                EventHandler_ReceivedChatMessage?.Invoke(Msg.DataAs<ChatMessageArgs>(_envelope)); 
+                break;
+            // Lobby
+            case ServerMsgTypes.RoomList:
+                EventHandler_ReceivedRoomList?.Invoke(Msg.DataAs<RoomListArgs>(_envelope));
+                break;
+            case ServerMsgTypes.CreateRoom:
+            case ServerMsgTypes.JoinRoom:
+                EventHandler_JoinRoomResponse?.Invoke(Msg.DataAs<RequestResponse>(_envelope));
+                break;
+            // Room
+            case ServerMsgTypes.RoomState:
+                EventHandler_ReceivedRoomState?.Invoke(Msg.DataAs<RoomState>(_envelope));
+                break;
+            // In Game
+            
+            default: ; break;
+        }
+    }
+
     #endregion
     public void Chat(string _playerName, string _message)
     {

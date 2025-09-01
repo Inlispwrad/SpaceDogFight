@@ -12,18 +12,23 @@ public static class ClientMsgTypes
     public const string CreateRoom = "client::create_room";
     public const string JoinRoom = "client::join_room";
     public const string LeaveRoom = "client::leave_room";
-    
     public const string RequestRoomList = "client::request_room_list";
+    // Room
     public const string Chat = "client::chat";
+    public const string Ready = "client::ready";
+    public const string CancelReady = "client::cancel_ready";
 }
 
 public static class ServerMsgTypes
 {
     // Server
-    public const string JoinedRoom = "server::joined_room";
-    public const string LeavedRoom = "server::leaved_room";
+    public const string Error = "server::error";
+    public const string CreateRoom = "server::create_room";
+    public const string JoinRoom = "server::joine_room";
+    public const string LeaveRoom = "server::leave_room";
     public const string Chat = "server::chat";
     public const string RoomList = "server::room_list";
+    public const string RoomState = "server::room_state";
 }
 
 public sealed class MsgEnvelope(string _operator, JToken _jsonData)

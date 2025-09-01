@@ -1,4 +1,6 @@
+using Shared.Core.DataTypes;
 using SpaceDogFight.Server.Game.Net;
+using SpaceDogFight.Shared.Protocols;
 
 namespace SpaceDogFight.Server.Game.Room;
 
@@ -40,18 +42,31 @@ public class Room(string _roomName, string _password, int _capacity, ConnectionM
         await _broadcast(ids, _op, _data);
     }
 
+    public async Task BroadcastRoomState()
+    {
+        var roomState = new global::Shared.Core.DataTypes.RoomState();
+        roomState.players = new();
+        foreach (var player in players)
+        {
+            roomState.players.Add(new PlayerRoomArgs()
+            {
+                playerName = player.Value.playerName,
+                isReady = player.Value.IsReady
+            });
+        }
+
+        await BroadcastAsync(ServerMsgTypes.RoomState, roomState);
+    }
     #endregion
     
     
     
     #region Room Logic
-
     private bool ReadyCheck()
     {
         lock (playerLock)
             return players.Count > 0 && players.Values.All(_p => _p.IsReady);
     }
-
     private async void GameStart()
     {
         State = RoomState.InGame;
@@ -93,7 +108,7 @@ public class Room(string _roomName, string _password, int _capacity, ConnectionM
     {
         lock (playerLock)
         {
-            if (players.TryGetValue(_playerName, out var player))
+            if (players.Remove(_playerName, out var player))
             {
                 player.roomId = null;
                 return true;
