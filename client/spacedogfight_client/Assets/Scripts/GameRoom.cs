@@ -29,6 +29,7 @@ public partial class GameRoom : Panel
     {
         Network.EventHandler_ReceivedChatMessage += ReceiveChat;
         Network.EventHandler_ReceivedRoomState += ReceiveRoomState;
+        Network.EventHandler_ReceivedServerMessage += ReceiveServerMessage;
 
         sendChatBtn.Pressed += SendChat;
         readyBtn.Pressed += Ready;
@@ -55,6 +56,10 @@ public partial class GameRoom : Panel
         network.SendJson(Msg.Wrap(ClientMsgTypes.LeaveRoom, new{}).ToJsonString());
     }
 
+    private void ReceiveServerMessage(ServerMessage _serverMsg)
+    {
+        chatBoard.Text += $"\n[server] => {_serverMsg.message}";
+    }
     private void ReceiveChat(ChatMessageArgs _chatMsgs)
     {
         chatBoard.Text += $"\n[{_chatMsgs.playerName}]:{_chatMsgs.message}";
