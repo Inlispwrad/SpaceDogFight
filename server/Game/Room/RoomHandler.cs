@@ -85,6 +85,7 @@ public class RoomHandler(RoomManager _roomManager, ConnectionManager _connection
         {
             player.IsReady = true;
             await room.BroadcastRoomState();
+            room.TryStartCountdown();
         }
     }
 
