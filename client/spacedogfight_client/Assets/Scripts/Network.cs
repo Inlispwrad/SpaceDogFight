@@ -20,7 +20,6 @@ public partial class Network : Node
     }
     #endregion
     
-    
     #region WebSocket
     private WebSocketPeer _ws;
     // 按你实际端口改：如果是日志里 63623 就改成 63623；默认 Kestrel 本地是 5000
@@ -151,7 +150,6 @@ public partial class Network : Node
     public static event Action<RequestResponse> EventHandler_CreateRoomResponse;
     // Chat
     public static event Action<ChatMessageArgs> EventHandler_ReceivedChatMessage;
-
     public static event Action<ServerMessage> EventHandler_ReceivedServerMessage;
     // In Game
     public static event Action<FighterState> EventHandler_ReceivedFighterState;
@@ -186,8 +184,8 @@ public partial class Network : Node
             default: ; break;
         }
     }
-
     #endregion
+    
     public void Chat(string _playerName, string _message)
     {
         var chatMsg = new ChatMessageArgs()
@@ -197,7 +195,6 @@ public partial class Network : Node
         };
         _ws.SendText(Msg.Wrap(ClientMsgTypes.Chat, chatMsg).ToJsonString());
     }
-
     public void RequestRoomList()
     {
         _ws.SendText(Msg.Wrap(ClientMsgTypes.RequestRoomList, new(){

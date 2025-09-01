@@ -41,21 +41,14 @@ public partial class GameRoom : Panel
             showcase.RemoveChild(child);
         }
     }
-
-    public override void _Notification(int what)
-    {
-        if (what == MainLoop.NotificationApplicationFocusOut)
-        {
-            network.SendJson(Msg.Wrap(ClientMsgTypes.LeaveRoom, new{}).ToJsonString());
-        }
-    }
-
+    
     public override void _ExitTree()
     {
         base._ExitTree();
         network.SendJson(Msg.Wrap(ClientMsgTypes.LeaveRoom, new{}).ToJsonString());
     }
 
+    #region Hanlde Msg
     private void ReceiveServerMessage(ServerMessage _serverMsg)
     {
         chatBoard.Text += $"\n[server] => {_serverMsg.message}";
@@ -64,7 +57,6 @@ public partial class GameRoom : Panel
     {
         chatBoard.Text += $"\n[{_chatMsgs.playerName}]:{_chatMsgs.message}";
     }
-
     private void ReceiveRoomState(RoomState _roomState)
     {
         HashSet<string> removePlayers = new();
@@ -103,6 +95,16 @@ public partial class GameRoom : Panel
             chatInput.Text = "";
         }
     }
+    private void Ready()
+    {
+        network.SendJson(Msg.Wrap(ClientMsgTypes.Ready, new{}).ToJsonString());
+    }
+
+    private void CancelReady()
+    {
+        network.SendJson(Msg.Wrap(ClientMsgTypes.CancelReady, new{}).ToJsonString());
+    }
+    #endregion
 
     public void SetRoomName(string _roomName)
     {
@@ -112,14 +114,14 @@ public partial class GameRoom : Panel
     {
         localPlayerName = _playerName;
     }
-
-    private void Ready()
+    public void CleanUp()
     {
-        network.SendJson(Msg.Wrap(ClientMsgTypes.Ready, new{}).ToJsonString());
-    }
-
-    private void CancelReady()
-    {
-        network.SendJson(Msg.Wrap(ClientMsgTypes.CancelReady, new{}).ToJsonString());
+        chatBoard.Text = "";
+        foreach (var showcasePair in playerShowcases)
+        {
+            if (showcasePair.Value != null)
+                showcase.RemoveChild(showcasePair.Value);
+        }
+        playerShowcases.Clear();
     }
 }

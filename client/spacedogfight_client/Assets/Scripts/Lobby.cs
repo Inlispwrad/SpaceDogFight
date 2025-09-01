@@ -64,6 +64,7 @@ public partial class Lobby : Panel
     {
         this.Visible = true;
         room.Visible = false;
+        room.CleanUp();
         isRequesting = false;
         
         network.SendJson(Msg.Wrap(ClientMsgTypes.LeaveRoom, new{}).ToJsonString());

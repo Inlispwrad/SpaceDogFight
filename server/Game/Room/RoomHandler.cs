@@ -74,6 +74,7 @@ public class RoomHandler(RoomManager _roomManager, ConnectionManager _connection
                 if (_roomManager.GetRoom(roomId) != null)
                 {
                     await room.BroadcastRoomState();
+                    await room.BroadcastAsync(ServerMsgTypes.Message, new ServerMessage() { message = $"<{player.playerName}> has left room." });
                 }
             }
         }

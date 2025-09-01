@@ -56,7 +56,14 @@ public class RoomManagerHandler(RoomManager _roomManager, ConnectionManager _con
         {
             Console.WriteLine($"[Server] '{player.playerName}' Succeed to join the room.");
             var room = _roomManager.GetRoom(createRoomArgs.roomName);
-            if(room != null) await room.BroadcastRoomState();
+            if (room != null)
+            {
+                await room.BroadcastRoomState();
+                await room.BroadcastAsync(ServerMsgTypes.Message, new ServerMessage()
+                {
+                    message = $"<{player.playerName}> has joined the room."
+                });
+            }
             Console.WriteLine($"[Server] Finish Create Room Request.");
         }
 
@@ -80,7 +87,7 @@ public class RoomManagerHandler(RoomManager _roomManager, ConnectionManager _con
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[JoinRoom::error] player({_ctx.PlayerId}) exception: {ex.Message}");
+            Console.WriteLine($"[JoinRoom::error] <player({_ctx.PlayerId})> exception: {ex.Message}");
             await _connectionManager.SendAsync(_ctx.PlayerId, ServerMsgTypes.JoinRoom, new RequestResponse
             {
                 success = false,

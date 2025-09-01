@@ -101,7 +101,7 @@ public class Room(string _roomName, string _password, int _capacity, ConnectionM
         {
             await BroadcastAsync(ServerMsgTypes.Message, new ServerMessage()
             {
-                message = $"[color=red]Game is starting in ...... {i}s[/color]"
+                message = $"[color=red]Game is starting in ...... {i - 1}s[/color]"
             });
 
             try

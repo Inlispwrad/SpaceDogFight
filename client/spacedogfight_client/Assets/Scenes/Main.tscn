@@ -224,7 +224,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("5_gjahs")
 network = NodePath("../Network")
-roomNameLabel = NodePath("../Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/RoomNameHBox/RoomName_Label")
+roomNameLabel = NodePath("GameRoomTitle")
 chatBoard = NodePath("MarginContainer/HBoxContainer/Panel/ChatBoardBox/VBoxContainer/ChatBoard")
 chatInput = NodePath("MarginContainer/HBoxContainer/Panel/ChatBoardBox/VBoxContainer/HBoxContainer/ChatInput")
 sendChatBtn = NodePath("MarginContainer/HBoxContainer/Panel/ChatBoardBox/VBoxContainer/HBoxContainer/SendChat")
@@ -234,7 +234,7 @@ readyBtn = NodePath("MarginContainer/HBoxContainer/PlayerDisplayer/MarginContain
 cancelBtn = NodePath("MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/ReadyCheckBox/Btn_Cancel")
 exitBtn = NodePath("MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/ReadyCheckBox/Btn_Leave")
 
-[node name="LobbyTitle" type="Label" parent="GameRoom"]
+[node name="GameRoomTitle" type="Label" parent="GameRoom"]
 layout_mode = 0
 offset_right = 737.0
 offset_bottom = 107.0
