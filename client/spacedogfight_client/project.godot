@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="SpaceDogFight_client"
-run/main_scene="uid://cgvjnt7t32ql7"
+run/main_scene="uid://126xatb5vtka"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
