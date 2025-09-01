@@ -1,0 +1,386 @@
+[gd_scene load_steps=10 format=3 uid="uid://cgvjnt7t32ql7"]
+
+[ext_resource type="Script" uid="uid://b54j3n8tpmorr" path="res://Assets/Scripts/ApplicationManager.cs" id="1_kwblh"]
+[ext_resource type="Script" uid="uid://blsuxwssnlnw3" path="res://Assets/Scripts/Network.cs" id="2_wkehv"]
+[ext_resource type="Script" uid="uid://b80rk2j4261m" path="res://Assets/Scripts/Lobby.cs" id="3_2qpql"]
+[ext_resource type="Script" uid="uid://djfbellq1ng0t" path="res://Assets/Scripts/BlackVeil.cs" id="3_ygaiq"]
+[ext_resource type="Script" uid="uid://dm2airphgh1gy" path="res://Assets/Scripts/GameRoom.cs" id="5_gjahs"]
+[ext_resource type="PackedScene" uid="uid://df51i8ax6pprd" path="res://Assets/Prefabs/GameRoom_PlayerShowcase.tscn" id="6_g2icf"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_wkehv"]
+font_size = 48
+
+[sub_resource type="InputEventKey" id="InputEventKey_gjahs"]
+device = -1
+pressed = true
+keycode = 4194309
+
+[sub_resource type="Shortcut" id="Shortcut_g2icf"]
+events = [SubResource("InputEventKey_gjahs")]
+
+[node name="Main" type="Node" node_paths=PackedStringArray("network")]
+script = ExtResource("1_kwblh")
+network = NodePath("Network")
+
+[node name="Network" type="Node" parent="." node_paths=PackedStringArray("blackScreen")]
+script = ExtResource("2_wkehv")
+blackScreen = NodePath("../BlackVeil")
+
+[node name="Lobby" type="Panel" parent="." node_paths=PackedStringArray("network", "roomList", "warningLabel", "roomNameInput", "passwordInput", "playerNameInput", "refreshBtn", "createRoomBtn", "joinRoomBtn", "room")]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_2qpql")
+network = NodePath("../Network")
+roomList = NodePath("MarginContainer/HBoxContainer/LobbyPanel/RoomList")
+warningLabel = NodePath("MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/WarningSpace/LobbyWarningLabel")
+roomNameInput = NodePath("MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/RoomNameHBox/RoomName_Input")
+passwordInput = NodePath("MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/PasswordHBox/Password_Input")
+playerNameInput = NodePath("MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/PlayerNameHBox/PlayerName_Input")
+refreshBtn = NodePath("MarginContainer/HBoxContainer/LobbyPanel/Btn_Refresh")
+createRoomBtn = NodePath("MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/LobbyButtons/Btn_CreateRoom")
+joinRoomBtn = NodePath("MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/LobbyButtons/Btn_JoinRoom")
+room = NodePath("../GameRoom")
+
+[node name="LobbyTitle" type="Label" parent="Lobby"]
+layout_mode = 1
+offset_right = 647.0
+offset_bottom = 107.0
+text = "Space Dog Fight - Lobby"
+label_settings = SubResource("LabelSettings_wkehv")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="Lobby"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 113.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 64
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 64
+theme_override_constants/margin_bottom = 48
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Lobby/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 64
+
+[node name="LobbyPanel" type="Panel" parent="Lobby/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="Btn_Refresh" type="Button" parent="Lobby/MarginContainer/HBoxContainer/LobbyPanel"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -149.0
+offset_top = 3.0
+offset_right = -6.0
+offset_bottom = -421.0
+grow_horizontal = 0
+grow_vertical = 2
+text = "Refresh List"
+
+[node name="Title" type="Label" parent="Lobby/MarginContainer/HBoxContainer/LobbyPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 9.0
+offset_right = -125.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "Room List"
+
+[node name="RoomList" type="ItemList" parent="Lobby/MarginContainer/HBoxContainer/LobbyPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 32.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="InputPanel" type="PanelContainer" parent="Lobby/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="Lobby/MarginContainer/HBoxContainer/InputPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="RoomNameHBox" type="HBoxContainer" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.8
+theme_override_constants/separation = 16
+
+[node name="RoomName_Label" type="Label" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/RoomNameHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "Room Name"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="RoomName_Input" type="LineEdit" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/RoomNameHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+size_flags_stretch_ratio = 3.0
+
+[node name="PasswordHBox" type="HBoxContainer" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.8
+theme_override_constants/separation = 16
+
+[node name="Password_Label" type="Label" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/PasswordHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "Password"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Password_Input" type="LineEdit" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/PasswordHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+size_flags_stretch_ratio = 3.0
+
+[node name="WarningSpace" type="Panel" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="LobbyWarningLabel" type="RichTextLabel" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/WarningSpace"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+vertical_alignment = 2
+
+[node name="PlayerNameHBox" type="HBoxContainer" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.8
+theme_override_constants/separation = 16
+
+[node name="PlayerName_Label" type="Label" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/PlayerNameHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+text = "Player Name"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PlayerName_Input" type="LineEdit" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/PlayerNameHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+size_flags_stretch_ratio = 3.0
+
+[node name="LobbyButtons" type="HBoxContainer" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Space" type="Panel" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/LobbyButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Btn_CreateRoom" type="Button" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/LobbyButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Create Room"
+
+[node name="Btn_JoinRoom" type="Button" parent="Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/LobbyButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Join Room"
+
+[node name="GameRoom" type="Panel" parent="." node_paths=PackedStringArray("network", "roomNameLabel", "chatBoard", "chatInput", "sendChatBtn", "showcase", "readyBtn", "cancelBtn", "exitBtn")]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_gjahs")
+network = NodePath("../Network")
+roomNameLabel = NodePath("../Lobby/MarginContainer/HBoxContainer/InputPanel/MarginContainer/VBoxContainer/RoomNameHBox/RoomName_Label")
+chatBoard = NodePath("MarginContainer/HBoxContainer/Panel/ChatBoardBox/VBoxContainer/ChatBoard")
+chatInput = NodePath("MarginContainer/HBoxContainer/Panel/ChatBoardBox/VBoxContainer/HBoxContainer/ChatInput")
+sendChatBtn = NodePath("MarginContainer/HBoxContainer/Panel/ChatBoardBox/VBoxContainer/HBoxContainer/SendChat")
+showcase = NodePath("MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/Players/Showcaser")
+playerShowcasePrefab = ExtResource("6_g2icf")
+readyBtn = NodePath("MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/ReadyCheckBox/Btn_Ready")
+cancelBtn = NodePath("MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/ReadyCheckBox/Btn_Cancel")
+exitBtn = NodePath("MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/ReadyCheckBox/Btn_Leave")
+
+[node name="LobbyTitle" type="Label" parent="GameRoom"]
+layout_mode = 0
+offset_right = 737.0
+offset_bottom = 107.0
+text = "Game Room: XXXXX"
+label_settings = SubResource("LabelSettings_wkehv")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="GameRoom"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 113.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 64
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 64
+theme_override_constants/margin_bottom = 48
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GameRoom/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 64
+
+[node name="Panel" type="Panel" parent="GameRoom/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ChatBoardBox" type="MarginContainer" parent="GameRoom/MarginContainer/HBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameRoom/MarginContainer/HBoxContainer/Panel/ChatBoardBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ChatBoard" type="RichTextLabel" parent="GameRoom/MarginContainer/HBoxContainer/Panel/ChatBoardBox/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+vertical_alignment = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="GameRoom/MarginContainer/HBoxContainer/Panel/ChatBoardBox/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ChatInput" type="LineEdit" parent="GameRoom/MarginContainer/HBoxContainer/Panel/ChatBoardBox/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 4.0
+
+[node name="SendChat" type="Button" parent="GameRoom/MarginContainer/HBoxContainer/Panel/ChatBoardBox/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+shortcut = SubResource("Shortcut_g2icf")
+text = "Send"
+
+[node name="PlayerDisplayer" type="PanelContainer" parent="GameRoom/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="GameRoom/MarginContainer/HBoxContainer/PlayerDisplayer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameRoom/MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Players" type="Panel" parent="GameRoom/MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 5.0
+
+[node name="Showcaser" type="VBoxContainer" parent="GameRoom/MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/Players"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameRoomPlayerShowcase" parent="GameRoom/MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/Players/Showcaser" instance=ExtResource("6_g2icf")]
+layout_mode = 2
+
+[node name="ReadyCheckBox" type="HBoxContainer" parent="GameRoom/MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Btn_Leave" type="Button" parent="GameRoom/MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/ReadyCheckBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Leave"
+
+[node name="Btn_Ready" type="Button" parent="GameRoom/MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/ReadyCheckBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Ready"
+
+[node name="Btn_Cancel" type="Button" parent="GameRoom/MarginContainer/HBoxContainer/PlayerDisplayer/MarginContainer/VBoxContainer/ReadyCheckBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
+[node name="BlackVeil" type="Panel" parent="." node_paths=PackedStringArray("blackScreenNoticer")]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("3_ygaiq")
+blackScreenNoticer = NodePath("BlackScreenNoticer")
+
+[node name="ColorRect" type="ColorRect" parent="BlackVeil"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="BlackScreenNoticer" type="RichTextLabel" parent="BlackVeil"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+bbcode_enabled = true
+text = "[font_size=48]Connecting to server...[/font_size]"
+horizontal_alignment = 1
+vertical_alignment = 1
