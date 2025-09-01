@@ -17,6 +17,10 @@ public static class ClientMsgTypes
     public const string Chat = "client::chat";
     public const string Ready = "client::ready";
     public const string CancelReady = "client::cancel_ready";
+    // In Game
+    public const string FighterMovement = "client::game::fighter_movement";
+    public const string FighterStats = "client::game::fighter_stats";
+    public const string FighterCommand = "client::game::fighter_command";
 }
 
 public static class ServerMsgTypes
@@ -29,6 +33,8 @@ public static class ServerMsgTypes
     public const string Chat = "server::chat";
     public const string RoomList = "server::room_list";
     public const string RoomState = "server::room_state";
+    
+    public const string FighterState =  "server::fighter_state";
 }
 
 public sealed class MsgEnvelope(string _operator, JToken _jsonData)
