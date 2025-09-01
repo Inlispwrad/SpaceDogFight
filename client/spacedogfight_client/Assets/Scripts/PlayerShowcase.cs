@@ -6,6 +6,8 @@ public partial class PlayerShowcase : Control
     [Export] private ColorRect colorRect;
     [Export] private Label playerNameLabel;
 
+    public string PlayerName => playerNameLabel?.Text ?? "";
+
     public void SetReady(bool _isReady)
     {
         colorRect.Visible = _isReady;
@@ -13,5 +15,10 @@ public partial class PlayerShowcase : Control
     public void SetPlayerName(string _playerName)
     {
         playerNameLabel.Text = _playerName;
+    }
+    public string GetPlayerName()
+    {
+        if (playerNameLabel == null) return "";
+        return playerNameLabel.Text;
     }
 }

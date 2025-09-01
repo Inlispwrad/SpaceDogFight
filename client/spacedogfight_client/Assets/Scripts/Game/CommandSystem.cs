@@ -1,5 +1,7 @@
 using Godot;
 using System.Collections.Generic;
+using SpaceDogFight.Shared.Protocols;
+
 
 public partial class CommandSystem : Node
 {
@@ -133,7 +135,8 @@ public partial class CommandSystem : Node
                          $"pos=({pos.X:0.0},{pos.Y:0.0}) rot={Mathf.RadToDeg(rot):0.0}°");
             }
         }
-
+        
+        
         void DoDash(float localAngle)
         {
             if (!Spend(dashCost))
