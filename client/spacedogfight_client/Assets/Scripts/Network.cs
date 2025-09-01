@@ -42,7 +42,6 @@ public partial class Network : Node
             SendJson(Msg.Wrap(ClientMsgTypes.FighterStats, _fighterStats).ToJsonString());
         };
         
-        
         ShowBlackScreen("Initializing Network...");
         _ws = new WebSocketPeer();
         var err = _ws.ConnectToUrl(Url);                  // 这里只是“开始连接”，不是已连上

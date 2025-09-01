@@ -14,12 +14,10 @@ public class MsgDispatcher(RoomManagerHandler _roomManagerHandler, RoomHandler _
             case ClientMsgTypes.RequestRoomList:
                 await _roomManagerHandler.HandleAsync(_ctx);
                 break;
-            case ClientMsgTypes.LeaveRoom:
-            case ClientMsgTypes.Chat:
-            case ClientMsgTypes.Ready:
-            case ClientMsgTypes.CancelReady:
+            default:
                 await _roomHandler.HandleAsync(_ctx);
                 break;
+            
         }
     }
 }

@@ -1,4 +1,5 @@
 using Shared.Core.DataTypes;
+using SpaceDogFight.Server.Game.Core;
 using SpaceDogFight.Server.Game.Net;
 using SpaceDogFight.Shared.Protocols;
 
@@ -10,7 +11,8 @@ public class Room(string _roomName, string _password, int _capacity, ConnectionM
 
     public enum RoomState : byte
     {
-        InLobby = 0, 
+        InRoom = 0, 
+        Countdown,
         InGame
     }
     #endregion
@@ -21,12 +23,13 @@ public class Room(string _roomName, string _password, int _capacity, ConnectionM
     private readonly Dictionary<string, Player> players = new();
     private readonly object playerLock = new();
     public int PlayerCapacity { get; } = _capacity;
-    public RoomState State { get; private set; } = RoomState.InLobby;
+    public RoomState State { get; private set; } = RoomState.InRoom;
+
+    private GameManager gameManager;
     
     
     #region Message
     private readonly ConnectionManager.SendDelegate sendMsg = _send;
-
     public async Task BroadcastAsync(string _op, object _data, List<string>? _exception = null)
     {
         List<string> ids;
@@ -57,11 +60,76 @@ public class Room(string _roomName, string _password, int _capacity, ConnectionM
 
         await BroadcastAsync(ServerMsgTypes.RoomState, roomState);
     }
+
+    public async Task GameMessageHandler(MsgContext _ctx)
+    {
+        if (gameManager != null)
+        {
+            await gameManager.HandleMsg(_ctx);
+        }
+        else
+        {
+            Console.WriteLine($"[Server::Error] Game is not start!!! cannot handle: {_ctx.Envelope.ToJsonString()}");
+            return;
+        }
+    }
+
     #endregion
     
     
-    
     #region Room Logic
+    private CancellationTokenSource countdownCts;
+    private Task? countdownTask;
+
+    public void TryStartCountdown()
+    {
+        lock (playerLock)
+        {
+            if (State != RoomState.InRoom || !ReadyCheck() || countdownTask != null)
+                return;
+
+            State = RoomState.Countdown;
+            countdownCts = new CancellationTokenSource();
+            countdownTask = CountdownAsync(countdownCts.Token);
+        }
+
+    }
+
+    private async Task CountdownAsync(CancellationToken _token)
+    {
+        for (int i = 6; i >= 1; i--)
+        {
+            await BroadcastAsync(ServerMsgTypes.Message, new ServerMessage()
+            {
+                message = $"[color=red]Game is starting in ...... {i}s[/color]"
+            });
+
+            try
+            {
+                await Task.Delay(1000, _token);
+            }
+            catch (TaskCanceledException)
+            {
+                return;
+            }
+
+            lock (playerLock)
+            {
+                if (!ReadyCheck())
+                {
+                    State = RoomState.InRoom;
+                    countdownTask = null;
+                    return;
+                }
+            }
+        }
+
+        State = RoomState.InGame;
+        countdownTask = null;
+        
+        gameManager = new GameManager(this);
+        await BroadcastAsync(ServerMsgTypes.GameStart, new { });
+    }
     private bool ReadyCheck()
     {
         lock (playerLock)
@@ -74,7 +142,7 @@ public class Room(string _roomName, string _password, int _capacity, ConnectionM
     }
     private async void GameEnd()
     {
-        State = RoomState.InLobby;
+        State = RoomState.InRoom;
         await BroadcastAsync("GameEnd", new {});
     }
     #endregion

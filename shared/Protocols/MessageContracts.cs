@@ -27,6 +27,8 @@ public static class ServerMsgTypes
 {
     // Server
     public const string Error = "server::error";
+    public const string Message = "server::message";
+    
     public const string CreateRoom = "server::create_room";
     public const string JoinRoom = "server::joine_room";
     public const string LeaveRoom = "server::leave_room";
@@ -34,7 +36,9 @@ public static class ServerMsgTypes
     public const string RoomList = "server::room_list";
     public const string RoomState = "server::room_state";
     
-    public const string FighterState =  "server::fighter_state";
+    // Game Logic
+    public const string GameStart = "server::game_start";
+    public const string FighterState =  "server::game::fighter_state";
 }
 
 public sealed class MsgEnvelope(string _operator, JToken _jsonData)
