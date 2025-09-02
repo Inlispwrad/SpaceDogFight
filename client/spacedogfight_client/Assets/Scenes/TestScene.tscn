@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://cf8jbvxcioegs"]
+[gd_scene load_steps=2 format=3 uid="uid://cf8jbvxcioegs"]
+
+[ext_resource type="PackedScene" uid="uid://bcvkahigwfuyu" path="res://Assets/Prefabs/Fighter.tscn" id="1_woa84"]
 
 [node name="BattleScene" type="Node2D"]
 
@@ -11,3 +13,6 @@
 [node name="Network" type="Node" parent="."]
 
 [node name="FighterManager" type="Node" parent="."]
+
+[node name="Fighter" parent="." instance=ExtResource("1_woa84")]
+position = Vector2(-374, -49)

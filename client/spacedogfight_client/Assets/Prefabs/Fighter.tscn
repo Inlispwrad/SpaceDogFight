@@ -1,10 +1,25 @@
-[gd_scene load_steps=2 format=3 uid="uid://bcvkahigwfuyu"]
+[gd_scene load_steps=5 format=3 uid="uid://bcvkahigwfuyu"]
 
 [ext_resource type="Script" uid="uid://c1p6fy8pie3x1" path="res://Assets/Scripts/Game/Fighter.cs" id="1_6qmt7"]
+[ext_resource type="Script" uid="uid://buophaycp4x65" path="res://Assets/Scripts/Game/CommandSystem.cs" id="2_6syw7"]
+[ext_resource type="Texture2D" uid="uid://di1cj2h23dong" path="res://Assets/Art/Main Ship - Base - Full health.png" id="3_xmx0s"]
+[ext_resource type="Script" uid="uid://b5g8mcsgwdj5n" path="res://Assets/Scripts/Game/PlayerKeyboardToOS.cs" id="4_y6wfb"]
 
-[node name="Fighter" type="Node2D"]
+[node name="Fighter" type="Node2D" node_paths=PackedStringArray("OS", "Avatar")]
+position = Vector2(0, 3)
 script = ExtResource("1_6qmt7")
-
-[node name="CommandSystem" type="Node" parent="."]
+OS = NodePath("CommandSystem")
+Avatar = NodePath("Avatar")
 
 [node name="Avatar" type="Node2D" parent="."]
+position = Vector2(0, -5)
+
+[node name="Sprite2D" type="Sprite2D" parent="Avatar"]
+rotation = 1.5708
+texture = ExtResource("3_xmx0s")
+
+[node name="CommandSystem" type="Node" parent="."]
+script = ExtResource("2_6syw7")
+
+[node name="player" type="Node" parent="."]
+script = ExtResource("4_y6wfb")

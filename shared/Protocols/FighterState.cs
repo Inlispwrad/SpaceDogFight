@@ -8,7 +8,7 @@ namespace SpaceDogFight.Shared.Protocols;
 [Serializable]
 public sealed class FighterState
 {
-    public string playerName { get; set; } // 战机唯一ID（可选：区分玩家1/玩家2）
+    public string playerName { get; set; } = "";// 战机唯一ID（可选：区分玩家1/玩家2）
     
     // Stats Sync
     public StatsState? stats { get; set; } = null;
@@ -24,4 +24,5 @@ public sealed class FighterState
     {
         return JsonConvert.DeserializeObject<FighterState>(_json);
     }
+   
 }

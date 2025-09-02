@@ -1,11 +1,11 @@
-[gd_scene load_steps=10 format=3 uid="uid://cgvjnt7t32ql7"]
+[gd_scene load_steps=10 format=3 uid="uid://126xatb5vtka"]
 
 [ext_resource type="Script" uid="uid://b54j3n8tpmorr" path="res://Assets/Scripts/ApplicationManager.cs" id="1_kwblh"]
 [ext_resource type="Script" uid="uid://blsuxwssnlnw3" path="res://Assets/Scripts/Network.cs" id="2_wkehv"]
 [ext_resource type="Script" uid="uid://b80rk2j4261m" path="res://Assets/Scripts/Lobby.cs" id="3_2qpql"]
 [ext_resource type="Script" uid="uid://djfbellq1ng0t" path="res://Assets/Scripts/BlackVeil.cs" id="3_ygaiq"]
 [ext_resource type="Script" uid="uid://dm2airphgh1gy" path="res://Assets/Scripts/GameRoom.cs" id="5_gjahs"]
-[ext_resource type="PackedScene" uid="uid://df51i8ax6pprd" path="res://Assets/Prefabs/GameRoom_PlayerShowcase.tscn" id="6_g2icf"]
+[ext_resource type="PackedScene" path="res://Assets/Prefabs/GameRoom_PlayerShowcase.tscn" id="6_g2icf"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_wkehv"]
 font_size = 48
