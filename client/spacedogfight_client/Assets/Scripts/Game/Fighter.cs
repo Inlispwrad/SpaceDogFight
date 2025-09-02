@@ -9,7 +9,11 @@ public partial class Fighter : Node
     [Export] public int Id = 1; 
     public override void _Ready()
     {
-        if (OS == null || Avatar == null) return;
+        if (OS == null || Avatar == null)
+        {
+            GD.PushError("[Fighter] OS or Avatar not assigned.");
+            return;
+        }
         OS.Register(Id, Avatar);
     }
 }
