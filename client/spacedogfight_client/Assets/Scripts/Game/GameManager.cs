@@ -1,37 +1,39 @@
 using Godot;
 using System;
 using SpaceDogFight_client.Assets.Scripts.Game;
+using SpaceDogFight_client.Assets.Scripts.Game.AI;
 
 public partial class GameManager : Node
 {
-   [Export] PlayerController _playerController;
-   [Export] private PackedScene fighterPrefab;
+   [Export] FighterControllerBase playerController;
+   [Export] FighterManager fighterManager;
    [Export] private Node2D battlefield;
 
    #region godot
 
    public override void _Ready()
    {//初始化生成逻辑
-      var playerFighter =  SpawnFighter();
-      AssignPlayerFighter(playerFighter);
+      var playerFighter =  fighterManager.SpawnFighter(battlefield);
+      fighterManager.AssignPlayerFighter(playerController, playerFighter);
+      for (int i = 0; i < 3; i++)
+      {
+         var AI =new AI_Control();
+         AI.Name = "AI_" + i;
+         AddChild(AI);
+         var AIFighter = fighterManager.SpawnFighter(battlefield); 
+         
+         AIFighter.Name = "AIFighter_" + i;
+         fighterManager.AssignPlayerFighter(AI, AIFighter);
+         fighterManager.RandomFighterPosition(AIFighter);
+      }
+      
    }
-
+   
    #endregion
    
    #region api
 
-   public Fighter SpawnFighter()
-   {
-      var fighter = fighterPrefab.Instantiate<Fighter>();
-      battlefield.AddChild(fighter);
-      return fighter;
-   }
 
-   public void AssignPlayerFighter(Fighter fighter)
-   {
-      _playerController.GetOS(fighter);
-      
-   }
 
    #endregion
    

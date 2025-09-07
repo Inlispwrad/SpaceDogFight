@@ -1,5 +1,8 @@
 using Godot;
 using System;
+using Shared.Core.Protocols;
+using SpaceDogFight_client.Assets.Scripts.Game;
+using SpaceDogFight.Shared.Protocols;
 
 public partial class Fighter : Node2D
 {
@@ -12,11 +15,11 @@ public partial class Fighter : Node2D
     
     #region fighter stats
     //basic stats
-    private float maxEnergy, energy, energyRegen;
+    private float hp, maxEnergy, energy, energyRegen;
     
     //movement stats
     private Vector2 pos, vel;
-    private float rot;
+    private float angleInRadians;
     private float boostMul, boostCostPerSec, dashSpeed, dashCost;
 
     private float thrustAccel, maxSpeed, turnSpeed, damp;
@@ -73,7 +76,7 @@ public partial class Fighter : Node2D
     {
         //rotation
         int applyTurn = (op_turnR ? 1: 0) - (op_turnL ? 1 : 0);
-        rot += turnSpeed * dt * applyTurn;
+        angleInRadians += turnSpeed * dt * applyTurn;
         
         
    
@@ -84,7 +87,7 @@ public partial class Fighter : Node2D
         float accelUsed = 0f;
         if (op_forward)
         {
-            var fwd = Vector2.Right.Rotated(rot);
+            var fwd = Vector2.Right.Rotated(angleInRadians);
             float accel = thrustAccel;
             if (op_boost && SpendEnergy(boostCostPerSec * dt)) accel *= boostMul;
             accelUsed = accel;
@@ -99,15 +102,15 @@ public partial class Fighter : Node2D
       
         //apply movement changes
         this.Position = pos;
-        this.Rotation = rot;
-        GD.Print($"position:{Position},rotation:{Rotation}");
+        this.Rotation = angleInRadians;
+        //GD.Print($"position:{Position},rotation:{Rotation}");
         
         if (false)
         {
             GD.Print($"[Sim] fwd={op_forward} turn={applyTurn:+0;-0} " +
                      $"E:{e0:0.0}->{energy:0.0} accel={accelUsed:0.0} " +
                      $"vel=({vel.X:0.0},{vel.Y:0.0}) speed={vel.Length():0.0} " +
-                     $"pos=({pos.X:0.0},{pos.Y:0.0}) rot={Mathf.RadToDeg(rot):0.0}°");
+                     $"pos=({pos.X:0.0},{pos.Y:0.0}) rot={Mathf.RadToDeg(angleInRadians):0.0}°");
         }
         
     }
@@ -137,6 +140,27 @@ public partial class Fighter : Node2D
         }
     }
 
+    public void CorrectMovement(FighterManager _authKey, MovementState _correction)
+    {
+        if (_authKey == null)
+            return;
+        pos = new (_correction.position.x, _correction.position.y);
+        vel = new (_correction.velocity.x, _correction.velocity.y);
+        angleInRadians = Mathf.DegToRad(_correction.angle);
+        turnSpeed = Mathf.DegToRad(_correction.angularSpeed);
+        
+    }
+
+    public void CorrectStats(FighterManager _authKey, StatsState _stats)
+    {
+        if(_authKey == null)
+            return;
+        hp = _stats.hp;
+        energy = _stats.energy;
+        energyRegen = _stats.energyRegen;
+        
+    }
+    
     #endregion
  
 }

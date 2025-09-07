@@ -3,7 +3,7 @@ using Godot;
 
 namespace SpaceDogFight_client.Assets.Scripts.Game;
 
-public partial class PlayerController: Node
+public partial class PlayerController: FighterControllerBase
 {
     #region  definition
     [Serializable]
@@ -14,55 +14,44 @@ public partial class PlayerController: Node
     }
 
     #endregion
-    
-    //necessary components
-    private CommandSystem os;
-    
     //game key map
     private GameKey forward = new(Key.W);
     private GameKey turnL = new(Key.A);
     private GameKey turnR = new(Key.D);
-    public void GetOS(Fighter _fighter)
+    protected override void Decide()
     {
-        os = _fighter.GetOS();
-    }
-
-   
-    public override void _Process(double delta)
-    {
-        if (os == null)
-            return;
-        
-        
         if (Input.IsKeyPressed(forward.keyCode) && forward.isPressed==false)
         {
-            os.HandleCommand(FighterOperators.ForwardOn);  
+            os.SendCommand(new (FighterOperators.ForwardOn));  
             forward.isPressed = true;
         }
         else if (Input.IsKeyPressed(forward.keyCode) == false && forward.isPressed == true)
         {
-           os.HandleCommand(FighterOperators.ForwardOff);  
-           forward.isPressed = false;
+            os.SendCommand(new (FighterOperators.ForwardOff));  
+            forward.isPressed = false;
         }
         if (Input.IsKeyPressed(turnL.keyCode) && turnL.isPressed==false)
         {
-            os.HandleCommand(FighterOperators.TurnLeftOn);
+            os.SendCommand(new (FighterOperators.TurnLeftOn));
             turnL.isPressed = true;
         }
         else if (Input.IsKeyPressed(turnL.keyCode) == false && turnL.isPressed == true)
         {
-            os.HandleCommand(FighterOperators.TurnLeftOff);
+            os.SendCommand(new (FighterOperators.TurnLeftOff));
             turnL.isPressed = false;
         }
         if (Input.IsKeyPressed(turnR.keyCode) && turnR.isPressed==false)
         {
-            os.HandleCommand(FighterOperators.TurnRightOn);
+            os.SendCommand(new (FighterOperators.TurnRightOn));
             turnR.isPressed = true;
         }
         else if (Input.IsKeyPressed(turnR.keyCode) == false &&  turnR.isPressed == true)
         {
-            os.HandleCommand(FighterOperators.TurnRightOff);
+            os.SendCommand(new (FighterOperators.TurnRightOff));                                    
             turnR.isPressed = false;
         }
+        
+        
     }
+        
 }

@@ -3,38 +3,60 @@ using System.Collections.Generic;
 using SpaceDogFight.Shared.Protocols;
 
 
-public partial class CommandSystem : Node
-{
-    // Log every 0.25s so it doesn't spam
-   // [Export] public float DebugInterval = 0.25f;
-  //  [Export] public bool  DebugMovement = true;
-   // [ExportGroup("Dash")]
-   // [Export] public float DashDistance = 160f;   // how far a dash travels
-  //  [Export] public float DashDuration = 0.08f;  // how long the dash lasts
-  //  [Export] public float DashCooldown = 0.35f;  // time before next dash
- //   private readonly Dictionary<int, ControlledFighter> _fighters = new();
-  //  private double _dbgTimer;
-     Fighter fighter;
+public partial class CommandSystem : Node   
+{     
+     public struct Command(string _op)                     
+     {
+      public string op = _op;
+     }          
+     Fighter fighter = null;
+     Queue<Command> commandQueue = new Queue<Command>();  
+     
+     
      #region  godot region     
-    
+     
      public override void _Ready()
      {
       SetPhysicsProcess(true);
       GD.Print("[OS] Ready");
      }
-            
-     #endregion
+
+     public override void _Process(double delta)
+     {
+      while (commandQueue.Count >0 && fighter != null)
+      { 
+       fighter.ApplyOp(commandQueue.Dequeue().op);
+      }
+     }
+
+     #endregion       
      
      #region api
     
      public void Register(Fighter fighter)
-     {
+     {        
       this.fighter = fighter; 
      }
      
-     public void HandleCommand(string command)
+     public void SendCommand(Command _command)
      {
-      fighter.ApplyOp(command);
+     commandQueue.Enqueue(_command);
+     }
+
+     public void SendCommandNoRepeat(Command _command)
+     {
+      if (CheckLastCommandNotDuplicate(_command))
+      {
+       SendCommand(_command);
+      }
+     }
+     public bool CheckLastCommandNotDuplicate(Command _command)
+     {
+      if (commandQueue.TryPeek(out var out_command))
+      {
+       return out_command.op != _command.op;
+      }
+      return true; 
      }
      #endregion
   
