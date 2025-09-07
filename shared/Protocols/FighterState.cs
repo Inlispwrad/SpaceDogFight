@@ -10,6 +10,10 @@ public sealed class FighterState
 {
     public string playerName { get; set; } = "";// 战机唯一ID（可选：区分玩家1/玩家2）
     
+    
+    // Command Sync
+    
+    
     // Stats Sync
     public StatsState? stats { get; set; } = null;
     // Movement Sync

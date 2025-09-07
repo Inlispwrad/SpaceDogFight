@@ -29,9 +29,13 @@ public partial class Network : Node
     private double _heartbeat = 0;
     private double _reconnectCd = 0;
     private int _retry = 0;
-    
-    public override void _Ready()
+
+    public override void _EnterTree()
     {
+        SendCommandState = (CommandState _commandState) =>
+        {
+            SendJson(Msg.Wrap(ClientMsgTypes.FighterCommand, _commandState).ToJsonString());
+        };
         SendFighterMovement = (MovementState _fighterMovement) =>
         {
             SendJson(Msg.Wrap(ClientMsgTypes.FighterMovement, _fighterMovement).ToJsonString());
@@ -40,7 +44,10 @@ public partial class Network : Node
         {
             SendJson(Msg.Wrap(ClientMsgTypes.FighterStats, _fighterStats).ToJsonString());
         };
-        
+    }
+
+    public override void _Ready()
+    {
         ShowBlackScreen("Initializing Network...");
         _ws = new WebSocketPeer();
         var err = _ws.ConnectToUrl(Url);                  // 这里只是“开始连接”，不是已连上
@@ -138,8 +145,9 @@ public partial class Network : Node
     #region Message Requester
 
     public static Action<string, string> SendChatMessage { get; private set; }
-    public static Action<MovementState> SendFighterMovement { get; private set; }
-    public static Action<StatsState> SendFighterStats { get; private set; }
+    public static Action<MovementState> SendFighterMovement { get; private set; } // <= TODO:: 发送飞机运动状态
+    public static Action<StatsState> SendFighterStats { get; private set; }       // <= TODO:: 发送飞机属性状态
+    public static Action<CommandState> SendCommandState { get; private set; }     // <= TODO:: 发送飞机指令状态
     #endregion
     
     #region Message EventHandler
@@ -152,7 +160,10 @@ public partial class Network : Node
     public static event Action<ChatMessageArgs> EventHandler_ReceivedChatMessage;
     public static event Action<ServerMessage> EventHandler_ReceivedServerMessage;
     // In Game
-    public static event Action<FighterState> EventHandler_ReceivedFighterState;
+    public static event Action EventHandler_GameStart; // <= TODO:: 用于开始游戏
+    public static event Action EventHandler_GameEnd;
+    public static event Action<CommandState> EventHandler_ReceivedCommandState; // <= TODO:: 用于传递飞机指令（来自其他玩家
+    public static event Action<FighterState> EventHandler_ReceivedFighterState; // <= TODO:: 用于矫正飞机状态（来自其他玩家
     // Dispatcher
     private void MsgDispatcher(MsgEnvelope _envelope)
     {
@@ -178,6 +189,12 @@ public partial class Network : Node
                 EventHandler_ReceivedRoomState?.Invoke(Msg.DataAs<RoomState>(_envelope));
                 break;
             // In Game
+            case ServerMsgTypes.GameStart:
+                EventHandler_GameStart?.Invoke();
+                break;
+            case ServerMsgTypes.FighterCommand:
+                EventHandler_ReceivedCommandState?.Invoke(Msg.DataAs<CommandState>(_envelope));
+                break;
             case ServerMsgTypes.FighterState:
                 EventHandler_ReceivedFighterState?.Invoke(Msg.DataAs<FighterState>(_envelope));
                 break;

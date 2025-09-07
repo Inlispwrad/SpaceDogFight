@@ -30,15 +30,18 @@ public class Room(string _roomName, string _password, int _capacity, ConnectionM
     
     #region Message
     private readonly ConnectionManager.SendDelegate sendMsg = _send;
-    public async Task BroadcastAsync(string _op, object _data, List<string>? _exception = null)
+    public async Task BroadcastAsync(string _op, object _data, List<string>? _exceptionIds = null, List<string>? _exceptionNames = null)
     {
         List<string> ids;
 
         lock (playerLock)
         {
             ids = players.Values
-                .Select(p => p.playerId)
-                .Where(id => _exception == null || !_exception.Contains(id))
+                .Select(_p => (_p.playerId, _p.playerName))
+                .Where(_pair 
+                    => (_exceptionIds == null || !_exceptionIds.Contains(_pair.playerId)) 
+                    && (_exceptionNames == null || !_exceptionNames.Contains(_pair.playerName)))
+                .Select(_pair => _pair.playerId)
                 .ToList();
         }
 

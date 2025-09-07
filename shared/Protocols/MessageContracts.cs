@@ -38,7 +38,9 @@ public static class ServerMsgTypes
     
     // Game Logic
     public const string GameStart = "server::game_start";
+    public const string GameEnd = "server::game_end";
     public const string FighterState =  "server::game::fighter_state";
+    public const string FighterCommand = "server::game::fighter_command";
 }
 
 public sealed class MsgEnvelope(string _operator, JToken _jsonData)

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Shared.Core.Protocols;
 using SpaceDogFight.Server.Game.Net;
 using SpaceDogFight.Shared.Protocols;
 
@@ -8,6 +9,10 @@ public class GameManager
 {
     private readonly ConcurrentDictionary<string, FighterState> fighterStates = new();
     private readonly Room.Room room;
+    
+    // Tick
+    private CancellationTokenSource tickCts;
+    private Task? tickTask;
 
     public GameManager(Room.Room _room)
     {
@@ -22,11 +27,15 @@ public class GameManager
             });
         }
     }
-
+    
+    #region Message
     public async Task HandleMsg(MsgContext _ctx)
     {
         switch (_ctx.Envelope.op)
         {
+            case ClientMsgTypes.FighterCommand:
+                await HandleFighterCommand(_ctx);
+                break;
             case ClientMsgTypes.FighterStats:
             case ClientMsgTypes.FighterMovement:
                 await HandleFighterState(_ctx);
@@ -34,6 +43,13 @@ public class GameManager
         }
     }
 
+    private async Task HandleFighterCommand(MsgContext _ctx)
+    {
+        CommandState commandStateData = Msg.DataAs<CommandState>(_ctx.Envelope);
+        if (commandStateData == null) return;
+
+        await room.BroadcastAsync(ServerMsgTypes.FighterCommand, commandStateData, [_ctx.PlayerId]);
+    }
     private async Task HandleFighterState(MsgContext _ctx)
     {
         FighterState fighterStateData = Msg.DataAs<FighterState>(_ctx.Envelope);
@@ -50,11 +66,16 @@ public class GameManager
             fighterState.stats = fighterStateData.stats;
         }
 
-        await BroadCastFighterState(fighterStateData, new() { fighterStateData.playerName });
+        await BroadCastFighterState(fighterStateData, [_ctx.PlayerId]);
     }
 
-    private async Task BroadCastFighterState(FighterState _fighterState, List<string> _exception)
+    private async Task BroadCastFighterState(FighterState _fighterState, List<string> _exceptionIds = null, List<string> _exceptionNames = null)
     {
-        await room.BroadcastAsync(ServerMsgTypes.FighterState, _fighterState, _exception);
+        await room.BroadcastAsync(ServerMsgTypes.FighterState, _fighterState, _exceptionIds, _exceptionNames);
     }
+    #endregion
+    
+    #region Gameplay Loop
+    //TODO:: Gameplay logic loop
+    #endregion
 }
