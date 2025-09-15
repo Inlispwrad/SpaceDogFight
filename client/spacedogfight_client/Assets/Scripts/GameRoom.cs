@@ -1,7 +1,9 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Shared.Core.DataTypes;
+using Shared.Core.Protocols;
 using SpaceDogFight.Shared.Protocols;
 
 public partial class GameRoom : Panel
@@ -22,6 +24,10 @@ public partial class GameRoom : Panel
     [Export] private Button readyBtn;
     [Export] private Button cancelBtn;
     [Export] private Button exitBtn;
+
+    [Export] private PackedScene gameplayScene;
+    private Gameplay gameplayInstance;
+    private bool matchStarted = false;
     
     public Action LeaveRoom;
     
@@ -40,6 +46,10 @@ public partial class GameRoom : Panel
         {
             showcase.RemoveChild(child);
         }
+
+        Network.EventHandler_GameStart += OnGameStart;
+        Network.EventHandler_ReceivedCommandState += OnReceivedCommandState;      
+        Network.EventHandler_ReceivedFighterState += OnReceivedFighterState; 
     }
     
     public override void _ExitTree()
@@ -47,6 +57,47 @@ public partial class GameRoom : Panel
         base._ExitTree();
         network.SendJson(Msg.Wrap(ClientMsgTypes.LeaveRoom, new{}).ToJsonString());
     }
+    
+
+    private void OnGameStart()
+    {   if (matchStarted) return;       
+             matchStarted = true;
+        chatBoard.Text += "\n server: game start!";
+       
+        if (gameplayInstance == null)
+        {
+            if (gameplayScene == null)
+            {
+                GD.PushError("[GameRoom] gameplayScene not set.");
+                return;
+            }
+
+            gameplayInstance = gameplayScene.Instantiate<Gameplay>();
+            GetParent()?.AddChild(gameplayInstance);
+            this.Visible = false; // hide lobby UI
+        }
+
+        var playerNames = playerShowcases.Keys.ToList();
+        if (!playerNames.Contains(localPlayerName)) 
+            playerNames.Add(localPlayerName);
+        
+        if (playerNames.Count == 0)                 
+            playerNames.Add(localPlayerName);
+
+        gameplayInstance.StartMatch(playerNames, localPlayerName);
+    }
+
+    private void OnReceivedCommandState(CommandState _cm)
+    {
+    }
+
+    private void OnReceivedFighterState(FighterState _fs)
+    {
+        
+        
+    }
+
+
 
     #region Hanlde Msg
     private void ReceiveServerMessage(ServerMessage _serverMsg)

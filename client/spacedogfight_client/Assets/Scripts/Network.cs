@@ -23,7 +23,7 @@ public partial class Network : Node
     #region WebSocket
     private WebSocketPeer _ws;
     // 按你实际端口改：如果是日志里 63623 就改成 63623；默认 Kestrel 本地是 5000
-    private const string Url = "wss://57d09112cae6.ngrok-free.app/ws"; // or 63623
+    private const string Url = "wss://6141a70e4422.ngrok-free.app/ws"; // or 63623
 
     private bool _connectedAnnounced = false;
     private double _heartbeat = 0;

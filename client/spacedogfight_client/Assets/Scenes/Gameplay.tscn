@@ -1,12 +1,15 @@
-[gd_scene load_steps=6 format=3 uid="uid://cf8jbvxcioegs"]
+[gd_scene load_steps=7 format=3 uid="uid://cf8jbvxcioegs"]
 
 [ext_resource type="Script" uid="uid://bb42cao8q2pks" path="res://Assets/Scripts/Game/GameManager.cs" id="1_sbeqj"]
+[ext_resource type="Script" uid="uid://c4x7d2g6mkhal" path="res://Assets/Scenes/Gameplay.cs" id="1_xno2i"]
 [ext_resource type="PackedScene" uid="uid://bcvkahigwfuyu" path="res://Assets/Prefabs/Fighter.tscn" id="2_of6tp"]
 [ext_resource type="Script" uid="uid://ciaog0navcn6p" path="res://Assets/Scripts/Game/PlayerController.cs" id="3_8ppif"]
 [ext_resource type="Script" uid="uid://c85ehxyfohloh" path="res://Assets/Scripts/Game/FighterManager.cs" id="3_of6tp"]
 [ext_resource type="Script" uid="uid://b1r613eh88tpg" path="res://Assets/Scripts/Game/AI/AI_Control.cs" id="5_8ppif"]
 
-[node name="GameplayScene" type="Node2D"]
+[node name="GameplayScene" type="Node2D" node_paths=PackedStringArray("GameManager")]
+script = ExtResource("1_xno2i")
+GameManager = NodePath("GameManager")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
